@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+         
+    <welcome-file-list>
+        <welcome-file>home</welcome-file>
+    </welcome-file-list>
+    
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+    
+    <!-- 配置文件上传大小限制 -->
+    <context-param>
+        <param-name>MAX_FILE_SIZE</param-name>
+        <param-value>1073741824</param-value> <!-- 1GB -->
+    </context-param>
+    
+    <context-param>
+        <param-name>MAX_REQUEST_SIZE</param-name>
+        <param-value>1073741824</param-value> <!-- 1GB -->
+    </context-param>
+    
+    <filter>
+        <filter-name>VideoAccessFilter</filter-name>
+        <filter-class>org.example.videoshareplatform01.filter.VideoAccessFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>VideoAccessFilter</filter-name>
+        <url-pattern>/videos/*</url-pattern>
+    </filter-mapping>
+</web-app>
