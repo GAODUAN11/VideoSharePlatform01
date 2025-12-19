@@ -34,9 +34,9 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -70,10 +70,10 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement和resultSet
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -108,10 +108,10 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement和resultSet
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -147,10 +147,10 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement和resultSet
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -186,10 +186,10 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement和resultSet
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -212,9 +212,9 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -235,9 +235,9 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -260,9 +260,9 @@ public class VideoDaoImpl implements VideoDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // 使用连接池后，不需要关闭连接，只需要关闭statement
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
