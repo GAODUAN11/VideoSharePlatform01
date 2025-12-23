@@ -14,6 +14,7 @@ import org.example.videoshareplatform01.util.ConfigUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @WebServlet("/upload")
@@ -68,9 +69,12 @@ public class UploadServlet extends HttpServlet {
 
             // 重新命名文件，加入真实的videoId，并复用最初的时间戳
             String finalFileName = uploadTimestamp + "_" + videoId + "_" + fileName;
+            Path filePath = Paths.get(UPLOAD_DIR, finalFileName);
+//            filePart.write(UPLOAD_DIR + File.separator + finalFileName);
+            filePart.write(filePath.toString());
+
             videoService.updateVideoFilePath(videoId, finalFileName); // 更新数据库中的文件路径
             
-            filePart.write(UPLOAD_DIR + File.separator + finalFileName);
 
             response.sendRedirect("profile");
         } catch (IllegalStateException e) {
