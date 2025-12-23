@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +38,8 @@ public class VideoAccessFilter implements Filter {
         // 获取请求的视频文件名
         String requestURI = httpRequest.getRequestURI();
         String contextPath = httpRequest.getContextPath();
-        String videoFileName = requestURI.substring(contextPath.length() + "/videos/".length());
+        String encodedFileName = requestURI.substring(contextPath.length() + "/videos/".length());
+        String videoFileName = URLDecoder.decode(encodedFileName, StandardCharsets.UTF_8);
 
         // 构建完整文件路径
         Path videoPath = Paths.get(UPLOAD_DIR, videoFileName);
@@ -45,7 +48,7 @@ public class VideoAccessFilter implements Filter {
         // 检查文件是否存在
         if (Files.exists(videoPath) && Files.isRegularFile(videoPath)) {
             System.out.println("文件存在，继续处理权限");
-            
+
             // 检查视频访问权限
             if (!checkVideoAccessPermission(videoFileName, httpRequest)) {
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -119,7 +122,6 @@ public class VideoAccessFilter implements Filter {
      */
     private int extractVideoIdFromFilename(String filename) {
         try {
-            // 使用正则表达式匹配 timestamp_videoId_filename 格式
             String[] parts = filename.split("_");
             if (parts.length >= 2) {
                 return Integer.parseInt(parts[1]);

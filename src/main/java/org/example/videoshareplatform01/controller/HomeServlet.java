@@ -13,10 +13,12 @@ import org.example.videoshareplatform01.util.ConfigUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
@@ -39,6 +41,12 @@ public class HomeServlet extends HttpServlet {
         }
 
         List<Video> publicVideos = videoService.getAllPublicVideos();
+        publicVideos.forEach(video -> {
+            String filePath = video.getFilePath();
+            if (filePath != null) {
+                video.setFilePath(URLEncoder.encode(filePath, StandardCharsets.UTF_8));
+            }
+        });
         request.setAttribute("publicVideos", publicVideos);
         request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
     }

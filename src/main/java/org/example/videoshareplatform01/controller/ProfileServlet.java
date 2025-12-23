@@ -12,6 +12,8 @@ import org.example.videoshareplatform01.service.VideoService;
 import org.example.videoshareplatform01.util.ConfigUtil;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @WebServlet("/profile")
@@ -35,6 +37,12 @@ public class ProfileServlet extends HttpServlet {
         }
 
         List<Video> userVideos = videoService.getUserVideos(user.getId());
+        userVideos.forEach(video -> {
+            String filePath = video.getFilePath();
+            if (filePath != null) {
+                video.setFilePath(URLEncoder.encode(filePath, StandardCharsets.UTF_8));
+            }
+        });
         request.setAttribute("userVideos", userVideos);
         request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
     }
