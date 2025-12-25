@@ -40,14 +40,30 @@ public class HomeServlet extends HttpServlet {
             return;
         }
 
-        List<Video> publicVideos = videoService.getAllPublicVideos();
-        publicVideos.forEach(video -> {
+        // 获取分类参数
+        String categoryName = request.getParameter("category");
+        
+        List<Video> videos;
+        if (categoryName != null && !categoryName.trim().isEmpty()) {
+            // 按分类获取视频
+            videos = videoService.getVideosByCategory(categoryName);
+            request.setAttribute("selectedCategory", categoryName);
+        } else {
+            // 获取所有公共视频
+            videos = videoService.getAllPublicVideos();
+        }
+        
+        videos.forEach(video -> {
             String filePath = video.getFilePath();
             if (filePath != null) {
                 video.setFilePath(URLEncoder.encode(filePath, StandardCharsets.UTF_8));
             }
         });
-        request.setAttribute("publicVideos", publicVideos);
+        request.setAttribute("publicVideos", videos);
+        
+        // 添加所有分类列表，用于下拉菜单
+        request.setAttribute("allCategories", videoService.getAllCategories());
+        
         request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
     }
 }

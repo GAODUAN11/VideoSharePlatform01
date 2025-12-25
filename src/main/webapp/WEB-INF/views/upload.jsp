@@ -1,4 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -42,6 +45,26 @@
                 </div>
                 
                 <div class="form-group">
+                    <label>视频分类:</label>
+                    <div class="category-selection" id="categorySelection">
+                        <%
+                            @SuppressWarnings("unchecked")
+                            List<String> categories = (List<String>) request.getAttribute("categories");
+                            if (categories != null && !categories.isEmpty()) {
+                                for (String category : categories) {
+                        %>
+                                    <span class="category-tag selectable" onclick="toggleCategory(this, '<%= category %>')">
+                                        <input type="checkbox" name="categories" value="<%= category %>" style="display: none;">
+                                        <%= category %>
+                                    </span>
+                        <%
+                                }
+                            }
+                        %>
+                    </div>
+                </div>
+                
+                <div class="form-group">
                     <label for="videoFile">选择视频文件 (最大支持1GB):</label>
                     <input type="file" id="videoFile" name="videoFile" accept="video/*" required>
                 </div>
@@ -55,5 +78,16 @@
             </form>
         </div>
     </main>
+    
+    <script>
+        function toggleCategory(element, categoryValue) {
+            // 切换选中状态
+            element.classList.toggle('selected');
+            
+            // 获取隐藏的复选框并切换其状态
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+        }
+    </script>
 </body>
 </html>

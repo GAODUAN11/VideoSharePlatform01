@@ -37,6 +37,20 @@ public class VideoService {
         return video.getId();
     }
     
+    public int uploadVideoWithCategoriesAndGetId(String title, String description, String filePath, int userId, boolean isPublic, List<Integer> categoryIds) {
+        Video video = new Video(title, description, filePath, userId, isPublic);
+        videoDao.save(video);
+        
+        // 保存视频分类
+        videoDao.saveVideoCategories(video.getId(), categoryIds);
+        
+        return video.getId();
+    }
+    
+    public void updateVideoCategories(int videoId, List<Integer> categoryIds) {
+        videoDao.saveVideoCategories(videoId, categoryIds);
+    }
+    
     public void updateVideoFilePath(int videoId, String newFilePath) {
         videoDao.updateVideoFilePath(videoId, newFilePath);
     }
@@ -57,6 +71,18 @@ public class VideoService {
         return videoDao.findById(id);
     }
     
+    public List<Video> getVideosByCategory(String categoryName) {
+        return videoDao.findVideosByCategory(categoryName);
+    }
+    
+    public List<String> getAllCategories() {
+        return videoDao.getAllCategories();
+    }
+    
+    public Integer getCategoryIdByName(String categoryName) {
+        return videoDao.getCategoryIdByName(categoryName);
+    }
+
     public void deleteVideo(int videoId) {
         videoDao.deleteVideo(videoId);
     }
@@ -148,4 +174,3 @@ public class VideoService {
         return false;
     }
 }
-

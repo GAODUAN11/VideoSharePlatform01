@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -39,6 +40,15 @@
                 <div class="video-info-detail">
                     <h2>${video.title}</h2>
                     <p class="video-description">${video.description}</p>
+                    
+                    <c:if test="${not empty video.categories}">
+                        <div class="video-categories">
+                            <h4>分类:</h4>
+                            <c:forEach items="${video.categories}" var="category">
+                                <a href="${pageContext.request.contextPath}/category?name=${category}" class="category-tag">${category}</a>
+                            </c:forEach>
+                        </div>
+                    </c:if>
                     
                     <div class="video-meta">
                         <c:if test="${!video.getPublic()}">

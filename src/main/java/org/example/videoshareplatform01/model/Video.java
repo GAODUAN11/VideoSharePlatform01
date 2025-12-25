@@ -1,6 +1,7 @@
 package org.example.videoshareplatform01.model;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Video {
     private int id;
@@ -10,6 +11,7 @@ public class Video {
     private int userId;
     private boolean isPublic;
     private Timestamp uploadTime;
+    private List<String> categories; // 添加分类列表
 
     public Video() {}
 
@@ -76,6 +78,15 @@ public class Video {
 
     public void setUploadTime(Timestamp uploadTime) {
         this.uploadTime = uploadTime;
+    }
+    
+    // 添加分类相关的方法
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
     
     // 添加一个兼容JSP EL表达式的getter方法

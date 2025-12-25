@@ -13,6 +13,8 @@ import org.example.videoshareplatform01.util.ConfigUtil;
 import org.example.videoshareplatform01.util.FileUploadUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/upload")
 @MultipartConfig(
@@ -39,8 +41,27 @@ public class UploadServlet extends HttpServlet {
         }
 
         try {
+            // 获取上传的视频信息
+            String title = request.getParameter("title");
+            String description = request.getParameter("description");
+            String isPublicParam = request.getParameter("isPublic");
+            boolean isPublic = "on".equals(isPublicParam) || "true".equals(isPublicParam);
+            
+            // 获取选中的分类名称
+            String[] categoryNames = request.getParameterValues("categories");
+            List<Integer> selectedCategoryIds = new ArrayList<>();
+            if (categoryNames != null) {
+                for (String categoryName : categoryNames) {
+                    // 根据分类名称获取分类ID
+                    Integer categoryId = videoService.getCategoryIdByName(categoryName);
+                    if (categoryId != null) {
+                        selectedCategoryIds.add(categoryId);
+                    }
+                }
+            }
+
             // 使用优化的FileUploadUtil处理文件上传
-            String finalFileName = FileUploadUtil.processVideoUpload(request, videoService, user.getId());
+            String finalFileName = FileUploadUtil.processVideoUploadWithCategories(request, videoService, user.getId(), title, description, isPublic, selectedCategoryIds);
 
             response.sendRedirect("profile");
         } catch (Exception e) {
@@ -70,6 +91,11 @@ public class UploadServlet extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+
+        // 获取所有分类供上传页面使用
+        VideoService videoService = new VideoService();
+        List<String> categories = videoService.getAllCategories();
+        request.setAttribute("categories", categories);
 
         request.getRequestDispatcher("/WEB-INF/views/upload.jsp").forward(request, response);
     }

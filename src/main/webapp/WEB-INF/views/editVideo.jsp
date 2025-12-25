@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -39,11 +40,34 @@
                         <textarea id="description" name="description" rows="4">${video.description}</textarea>
                     </div>
                     
+                    <div class="form-group">
+                        <label>视频分类:</label>
+                        <div class="category-selection" id="categorySelection">
+                            <c:forEach var="category" items="${allCategories}">
+                                <span class="category-tag selectable ${fn:contains(video.categories, category) ? 'selected' : ''}" onclick="toggleCategory(this, '${category}')">
+                                    <input type="checkbox" name="categories" value="${category}" style="display: none;" ${fn:contains(video.categories, category) ? 'checked' : ''}>
+                                    ${category}
+                                </span>
+                            </c:forEach>
+                        </div>
+                    </div>
+                    
                     <button type="submit" class="btn">保存修改</button>
                     <a href="${pageContext.request.contextPath}/profile" class="btn-cancel">取消</a>
                 </form>
             </div>
         </div>
     </main>
+    
+    <script>
+        function toggleCategory(element, categoryValue) {
+            // 切换选中状态
+            element.classList.toggle('selected');
+            
+            // 获取隐藏的复选框并切换其状态
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+        }
+    </script>
 </body>
 </html>

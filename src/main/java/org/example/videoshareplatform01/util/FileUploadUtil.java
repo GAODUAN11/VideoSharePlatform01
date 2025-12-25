@@ -8,7 +8,9 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FileUploadUtil {
@@ -59,7 +61,61 @@ public class FileUploadUtil {
     }
     
     /**
-     * 处理视频上传的完整流程
+     * 处理视频上传的完整流程（包含分类）
+     * @param request HTTP请求对象
+     * @param videoService 视频服务
+     * @param userId 用户ID
+     * @param title 视频标题
+     * @param description 视频描述
+     * @param isPublic 是否公开
+     * @param categoryIds 分类ID列表
+     * @return 最终的文件名
+     */
+    public static String processVideoUploadWithCategories(HttpServletRequest request, VideoService videoService, int userId, 
+                                                         String title, String description, boolean isPublic, List<Integer> categoryIds) throws Exception {
+        // 获取上传的文件
+        Part filePart = request.getPart("videoFile");
+        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+
+        // 创建上传目录（如果不存在）
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // 生成临时文件名
+        long uploadTimestamp = System.currentTimeMillis();
+        String tempFileName = uploadTimestamp + "_0_" + fileName;
+
+        // 保存文件
+        String filePath = UPLOAD_DIR + File.separator + tempFileName;
+        filePart.write(filePath);
+
+        // 保存视频信息（包含分类）
+        int videoId = videoService.uploadVideoWithCategoriesAndGetId(title, description, tempFileName, userId, isPublic, categoryIds);
+
+        // 重命名文件，加入真实的videoId，并复用最初的时间戳
+        String oldFilePath = UPLOAD_DIR + File.separator + tempFileName;
+        String newFileName = uploadTimestamp + "_" + videoId + "_" + fileName;
+        String newFilePath = UPLOAD_DIR + File.separator + newFileName;
+        
+        // 重命名文件
+        File oldFile = new File(oldFilePath);
+        File newFile = new File(newFilePath);
+        if (!oldFile.renameTo(newFile)) {
+            // 如果renameTo失败，尝试使用copy和delete方式
+            java.nio.file.Files.copy(oldFile.toPath(), newFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            oldFile.delete();
+        }
+        
+        // 更新数据库中的文件路径
+        videoService.updateVideoFilePath(videoId, newFileName);
+        
+        return newFileName;
+    }
+    
+    /**
+     * 处理视频上传的完整流程（不带分类的向后兼容方法）
      * @param request HTTP请求对象
      * @param videoService 视频服务
      * @param userId 用户ID

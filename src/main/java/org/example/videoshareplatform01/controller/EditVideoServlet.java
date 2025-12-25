@@ -11,6 +11,8 @@ import org.example.videoshareplatform01.model.Video;
 import org.example.videoshareplatform01.service.VideoService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/editVideo")
 public class EditVideoServlet extends HttpServlet {
@@ -52,6 +54,23 @@ public class EditVideoServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
+
+            // 获取所有分类供编辑页面使用
+            List<String> allCategories = videoService.getAllCategories();
+            request.setAttribute("allCategories", allCategories);
+            
+            // 获取视频当前的分类ID列表
+            List<Integer> currentCategoryIds = new ArrayList<>();
+            List<String> currentCategoryNames = video.getCategories();
+            if (currentCategoryNames != null && !currentCategoryNames.isEmpty()) {
+                for (String categoryName : currentCategoryNames) {
+                    Integer categoryId = videoService.getCategoryIdByName(categoryName);
+                    if (categoryId != null) {
+                        currentCategoryIds.add(categoryId);
+                    }
+                }
+            }
+            request.setAttribute("currentCategoryIds", currentCategoryIds);
 
             request.setAttribute("video", video);
             request.getRequestDispatcher("/WEB-INF/views/editVideo.jsp").forward(request, response);
@@ -99,6 +118,22 @@ public class EditVideoServlet extends HttpServlet {
             video.setTitle(title);
             video.setDescription(description);
             videoService.updateVideo(video);
+            
+            // 获取选中的分类名称
+            String[] categoryNames = request.getParameterValues("categories");
+            List<Integer> selectedCategoryIds = new ArrayList<>();
+            if (categoryNames != null) {
+                for (String categoryName : categoryNames) {
+                    // 根据分类名称获取分类ID
+                    Integer categoryId = videoService.getCategoryIdByName(categoryName);
+                    if (categoryId != null) {
+                        selectedCategoryIds.add(categoryId);
+                    }
+                }
+            }
+            
+            // 更新视频分类
+            videoService.updateVideoCategories(videoId, selectedCategoryIds);
 
             // 重定向回个人页面
             response.sendRedirect("profile");
