@@ -7,15 +7,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
 import org.example.videoshareplatform01.model.User;
 import org.example.videoshareplatform01.service.VideoService;
 import org.example.videoshareplatform01.util.ConfigUtil;
+import org.example.videoshareplatform01.util.FileUploadUtil;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @WebServlet("/upload")
 @MultipartConfig(
@@ -25,8 +22,6 @@ import java.nio.file.Paths;
 )
 public class UploadServlet extends HttpServlet {
     private VideoService videoService;
-    // 从配置文件读取视频存储目录
-    private static final String UPLOAD_DIR = ConfigUtil.getProperty("video.upload.dir", "D:/video_uploads");
 
     @Override
     public void init() throws ServletException {
@@ -44,42 +39,24 @@ public class UploadServlet extends HttpServlet {
         }
 
         try {
-            // 获取上传的文件
-            Part filePart = request.getPart("videoFile");
-            String title = request.getParameter("title");
-            String description = request.getParameter("description");
-            String isPublicParam = request.getParameter("isPublic");
-            boolean isPublic = "on".equals(isPublicParam) || "true".equals(isPublicParam);
-
-            // 获取文件名
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-
-            // 创建上传目录（如果不存在）
-            File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
-            // 保存文件，文件名格式：timestamp_videoId_originalFilename
-            long uploadTimestamp = System.currentTimeMillis();
-            String tempFileName = uploadTimestamp + "_0_" + fileName;
-
-            // 先保存到数据库获取videoId
-            int videoId = videoService.uploadVideoAndGetId(title, description, tempFileName, user.getId(), isPublic);
-
-            // 重新命名文件，加入真实的videoId，并复用最初的时间戳
-            String finalFileName = uploadTimestamp + "_" + videoId + "_" + fileName;
-            Path filePath = Paths.get(UPLOAD_DIR, finalFileName);
-//            filePart.write(UPLOAD_DIR + File.separator + finalFileName);
-            filePart.write(filePath.toString());
-
-            videoService.updateVideoFilePath(videoId, finalFileName); // 更新数据库中的文件路径
-            
+            // 使用优化的FileUploadUtil处理文件上传
+            String finalFileName = FileUploadUtil.processVideoUpload(request, videoService, user.getId());
 
             response.sendRedirect("profile");
-        } catch (IllegalStateException e) {
-            // 处理文件大小超出限制的异常
-            request.setAttribute("errorMessage", "文件大小超出限制，请上传小于1GB的文件");
+        } catch (Exception e) {
+            // 处理上传异常，提供更详细的错误信息
+            String errorMessage = e.getMessage();
+            if (errorMessage == null || errorMessage.trim().isEmpty()) {
+                errorMessage = "上传失败: " + e.getClass().getSimpleName();
+            }
+            
+            if (errorMessage.contains("size") || errorMessage.contains("超出") || errorMessage.toLowerCase().contains("limit")) {
+                errorMessage = "文件大小超出限制，请上传小于1GB的文件";
+            } else {
+                errorMessage = "上传失败: " + errorMessage;
+            }
+            
+            request.setAttribute("errorMessage", errorMessage);
             request.getRequestDispatcher("/WEB-INF/views/upload.jsp").forward(request, response);
         }
     }
