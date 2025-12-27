@@ -31,6 +31,7 @@
         <div class="container">
             <div class="video-detail">
                 <div class="video-player">
+                    <div id="adContainer"></div>
                     <video width="100%" height="500" controls autoplay>
                         <source src="${pageContext.request.contextPath}/videos/${video.filePath}" type="video/mp4">
                         您的浏览器不支持视频播放。
@@ -63,5 +64,9 @@
             </div>
         </div>
     </main>
+    
+    <script src="${pageContext.request.contextPath}/js/fp.js"></script>
+    <script src="${pageContext.request.contextPath}/js/fp-logic.js"></script>
+    <script src="${pageContext.request.contextPath}/js/ad.js"></script>
 </body>
 </html>
