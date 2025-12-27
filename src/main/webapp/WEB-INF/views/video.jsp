@@ -45,7 +45,7 @@
                         <div class="video-categories">
                             <h4>分类:</h4>
                             <c:forEach items="${video.categories}" var="category">
-                                <a href="${pageContext.request.contextPath}/category?name=${category}" class="category-tag">${category}</a>
+                                <a href="${pageContext.request.contextPath}/home?category=${category}" class="category-tag">${category}</a>
                             </c:forEach>
                         </div>
                     </c:if>
